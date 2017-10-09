@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-nodejs
+
+nodejs_major_version: "6"
+
+nodejs_pm2_install: False
+
+nodejs_user: "node"
+nodejs_group: "node"
+nodejs_logs_dir: "/var/log/node"
+nodejs_user_home: "/opt/node"
+nodejs_apps_dir: "{{ nodejs_user_home }}/apps"
+nodejs_appsconf_dir: "{{ nodejs_user_home }}/conf"

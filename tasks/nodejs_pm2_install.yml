@@ -1,0 +1,54 @@
+---
+
+- name: Add node group
+  group: name={{ nodejs_group }} state=present
+
+- name: Add node user
+  user: name={{ nodejs_user }} comment="Node.js user" group={{ nodejs_group }} home={{ nodejs_user_home }}
+
+- name: Install PM2 globally
+  #npm: name=pm2 version=latest global=yes
+  shell: "npm i pm2@latest --no-optional -g --no-shrinkwrap"
+
+- name: Upload pm2 init file
+  template: src=nodejs_pm2_init.j2 dest=/etc/init.d/pm2 owner=root group=root mode=0755
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'
+
+- name: Create pm2 dump directory
+  file: path={{ nodejs_user_home }}/.pm2/ state=directory mode=0755 owner={{ nodejs_user }} group={{ nodejs_group }}
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+- name: Create pm2 dump file if it does not exist
+  copy: src=nodejs_pm2_dump dest={{ nodejs_user_home }}/.pm2/dump.pm2 owner={{ nodejs_user }} group={{ nodejs_group }} force=no
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+- name: Upload pm2 systemd file
+  template: src=nodejs_pm2_systemd.j2 dest=/etc/systemd/system/pm2.service owner=root group=root mode=0644
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+- name: just force systemd to reread configs
+  systemd:
+    daemon_reload=yes
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+- name: Enable pm2 init
+  service: name=pm2 enabled=yes state=started
+
+- name: Create pm2 logs directory
+  file: path={{ nodejs_logs_dir }} state=directory mode=0755 owner={{ nodejs_user }} group={{ nodejs_group }}
+
+- name: Upload pm2 logrotate file
+  template: src=nodejs_pm2_logrotate.j2 dest=/etc/logrotate.d/pm2-node owner=root group=root mode=0644
+
+- name: Create Node.js apps configuration directory
+  file: path={{ nodejs_appsconf_dir }} state=directory mode=0755 owner={{ nodejs_user }} group={{ nodejs_group }}
+
+- name: Create Node.js apps configuration directory
+  file: path={{ nodejs_apps_dir }} state=directory mode=0755 owner={{ nodejs_user }} group={{ nodejs_group }}
+
+- name: Install globally check_pm2 for nagios
+  #npm: name=check_pm2 version=latest global=yes
+  shell: "npm i check_pm2@latest --no-optional -g --no-shrinkwrap"
+
+- name: Allow nagios user to launch check_pm2
+  lineinfile: dest=/etc/sudoers regexp='^nagios' line="nagios          ALL=(ALL)       NOPASSWD:/usr/bin/check_pm2"

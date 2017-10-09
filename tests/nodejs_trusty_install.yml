@@ -1,0 +1,20 @@
+- name: deploy Nodejs
+  hosts: r1t01
+  become: yes
+  vars:
+    nodejs_major_version: "6"
+    nodejs_pm2_install: True
+  #  collectd_host_receives_data: "metro02g.bserv1.local"
+  #  collectd_install_plugins_list:
+  #    - nodejs
+    # graylogclient_graylog_server_addr: "graylog01l.btsys.local"
+    # graylogclient_graylog_server_port: "514"
+    # graylogclient_middleware_list:
+    #   - nodejs
+  roles:
+    - ../ansible-nodejs
+  #  - tests/ansible-collectd
+  #  - tests/ansible-graylogclient
+  # tasks:
+  #   - include: tasks/myapp_task.yml
+  #     tags: [myapp_deploy]

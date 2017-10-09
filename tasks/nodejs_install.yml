@@ -1,0 +1,24 @@
+---
+- name: "Install python-apt (dependency for Ansible apt_repository)"
+  apt: name="python-apt" state=present update_cache=true
+
+- name: Node.js Package Key
+  apt_key: url="http://mirror.services.local/pubkey/nodesource.gpg.key" state=present
+
+- name: Node.js APT repository
+  apt_repository: repo='deb http://mirror.services.local/nodejs{{ nodejs_major_version }}x/ {{ ansible_distribution_release }} main' state=present
+
+- name: Install Node.js
+  apt: name=nodejs state=latest
+
+- name: Adapt environment for NPM for users
+  lineinfile: dest=/etc/environment line="npm_config_globalconfig=/etc/npmrc"
+
+- name: Adapt environment for NPM for root via sudo
+  lineinfile: dest=/root/.npmrc line="globalconfig = /etc/npmrc" create=yes
+
+- name: Configure NPM
+  copy: src=nodejs_npmrc dest=/etc/npmrc
+
+- include: nodejs_pm2_install.yml
+  when: nodejs_pm2_install == True

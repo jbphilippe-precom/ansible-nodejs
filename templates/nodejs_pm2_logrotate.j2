@@ -1,0 +1,11 @@
+{{ nodejs_user_home }}/.pm2/pm2.log {{ nodejs_user_home }}/.pm2/logs/*.log {{ nodejs_logs_dir }}/*.log {
+    su {{ nodejs_user }} {{ nodejs_group }}
+    rotate 60
+    daily
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    create 0640 {{ nodejs_user }} {{ nodejs_group }}
+}

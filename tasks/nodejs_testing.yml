@@ -1,0 +1,47 @@
+---
+# node
+
+- shell: node --version
+  register: node_installed_version
+  changed_when: false
+
+- name: Verify node version
+  assert:
+    that:
+      - "'{{ nodejs_major_version }}' in node_installed_version.stdout"
+
+# logrotate
+- stat: path=/etc/logrotate.d/pm2-node
+  register: pm2node_logrotate
+  when: nodejs_pm2_install == True
+
+- name: Verify that logrotate is configured
+  assert:
+    that:
+      - pm2node_logrotate.stat.exists
+  when: nodejs_pm2_install == True
+
+# pm2
+- shell: pm2 ping
+  register: pm2_running
+  changed_when: false
+  when: nodejs_pm2_install == True
+
+- name: Verify pm2 pong
+  assert:
+    that:
+      - "'pong' in pm2_running.stdout"
+  when: nodejs_pm2_install == True
+
+# check_pm2
+- shell: check_pm2 -A
+  become_user: "{{ nodejs_user }}"
+  register: check_pm2_result
+  changed_when: false
+  when: nodejs_pm2_install == True
+
+- name: Verify that pm2 is OK
+  assert:
+    that:
+      - "'OK' in check_pm2_result.stdout"
+  when: nodejs_pm2_install == True

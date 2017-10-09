@@ -1,0 +1,2 @@
+cafile=/usr/local/share/ca-certificates/Infra_CA.crt
+registry=https://npm.services.local
