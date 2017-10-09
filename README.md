@@ -1,4 +1,3 @@
-[![build status](https://gitrep.services.local/ansible-middlewares/ansible-nodejs/badges/develop/build.svg)](https://gitrep.services.local/ansible-middlewares/ansible-nodejs/commits/develop)
 
 Role Name
 =========
@@ -50,13 +49,3 @@ Tags
 - [installation] : Node.js installation
 - [rollback] : does nothing yet
 - [testing] : Unit testing for Node.js
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-BSO ISL
